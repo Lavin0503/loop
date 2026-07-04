@@ -17,6 +17,10 @@
   <link rel="icon" href="Logo.webp" type="image/webp"/>
 
   <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -38,6 +42,42 @@
       z-index: 10000;
       border-bottom: 2px solid rgba(255,255,255,0.4);
       backdrop-filter: blur(4px);
+    }
+
+    #top-nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      background: rgba(0,0,0,0.5);
+      position: sticky;
+      top: 41px;
+      z-index: 9998;
+      backdrop-filter: blur(4px);
+      padding: 8px 10px;
+    }
+
+    #top-nav a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+      transition: 0.25s;
+    }
+
+    #top-nav a:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    .banner {
+      width: 100%;
+      max-height: 260px;
+      object-fit: cover;
+      display: block;
+      border-radius: 0 0 20px 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
     }
 
     header {
@@ -256,6 +296,93 @@
     .card button[type="submit"]:hover {
       background: rgba(0,0,0,0.55);
     }
+
+    .gallery-item {
+      cursor: pointer;
+      max-width: 300px;
+      width: 100%;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      display: block;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      transition: 0.25s;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.03);
+    }
+
+    .gallery-item p {
+      text-align: center;
+      margin: 8px 0 0;
+      font-weight: bold;
+    }
+
+    #product-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.75);
+      z-index: 10001;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #product-modal.open {
+      display: flex;
+    }
+
+    .modal-content {
+      background: linear-gradient(to left, #ff2e2e, #2e5eff, #d9b3ff, #ff2e2e);
+      border-radius: 20px;
+      padding: 25px;
+      max-width: 90%;
+      max-height: 90%;
+      overflow-y: auto;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    }
+
+    .modal-content img {
+      max-width: 100%;
+      max-height: 50vh;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .modal-content h3 {
+      margin: 15px 0 5px;
+      font-size: 1.6rem;
+    }
+
+    .modal-content .modal-price {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #fff7ff;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: rgba(0,0,0,0.4);
+      border: none;
+      color: white;
+      font-size: 1.3rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      background: rgba(0,0,0,0.6);
+    }
   </style>
 </head>
 
@@ -264,6 +391,15 @@
   <div id="top-notice">
     💳 We take card payments in person and via Gmail contact — Cash also accepted!
   </div>
+
+  <nav id="top-nav">
+    <a href="#about">About Us</a>
+    <a href="#gallery">Our Creations</a>
+    <a href="#payment">Payment</a>
+    <a href="#order">Order Form</a>
+    <a href="#contact">Contact Us</a>
+    <a href="#pricing">Pricing</a>
+  </nav>
 
   <div id="cutscene">
     <img src="Logo.webp" alt="Loop Fidgets & 3D Prints Logo Animation" style="width:250px; animation: bounce 2s infinite;"/>
@@ -275,7 +411,7 @@
     <p class="tagline">Spin it, click it, print it – Made just for you!</p>
   </header>
 
-  <section class="section intro">
+  <section class="section intro" id="about">
     <h2>About Us</h2>
     <p>
       Welcome to <strong>Loop Fidgets & 3D Prints</strong> — a small handmade business creating
@@ -289,17 +425,43 @@
     </p>
   </section>
 
-  <section class="section">
+  <section class="section" id="gallery">
     <h2>Our Creations</h2>
-    <div class="gallery">
-      <img src="LOOP.webp" alt="Fidget Loop">
-      <img src="Star Fidget.png" alt="Star Fidget">
-      <img src="Infinity Cube.png" alt="Infinity Cube">
-      <img src="Whistle.png" alt="Whistle">
+    <img src="LOOP.webp" alt="Loop Fidgets & 3D Prints Banner" class="banner">
+    <div class="gallery" style="margin-top:25px;">
+      <div class="gallery-item" onclick="openProduct('LOOP.webp','Fidget Loop','€1.50')">
+        <img src="LOOP.webp" alt="Fidget Loop">
+        <p>Fidget Loop</p>
+      </div>
+      <div class="gallery-item" onclick="openProduct('Star Fidget.png','Star Fidget','€4.50')">
+        <img src="Star Fidget.png" alt="Star Fidget">
+        <p>Star Fidget</p>
+      </div>
+      <div class="gallery-item" onclick="openProduct('Infinity Cube.png','Infinity Cube','€4.00')">
+        <img src="Infinity Cube.png" alt="Infinity Cube">
+        <p>Infinity Cube</p>
+      </div>
+      <div class="gallery-item" onclick="openProduct('Whistle.png','Whistle','€1.50')">
+        <img src="Whistle.png" alt="Whistle">
+        <p>Whistle</p>
+      </div>
+      <div class="gallery-item" onclick="openProduct('Spiral Cone.png','Spiral Cone','€3.00')">
+        <img src="Spiral Cone.png" alt="Spiral Cone">
+        <p>Spiral Cone</p>
+      </div>
     </div>
   </section>
 
-  <section class="section payment-section">
+  <div id="product-modal" onclick="if(event.target===this) closeProduct()">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeProduct()">✕</button>
+      <img id="modal-img" src="" alt="">
+      <h3 id="modal-name"></h3>
+      <p class="modal-price" id="modal-price"></p>
+    </div>
+  </div>
+
+  <section class="section payment-section" id="payment">
     <h2>Online Payment with Revolut</h2>
     <div class="payment-options">
       <button onclick="showQRCode()">Show QR Code</button>
@@ -308,14 +470,14 @@
     <div class="payment-display" id="paymentDisplay"></div>
   </section>
 
-  <section class="section">
+  <section class="section" id="order">
     <h2>Order Form</h2>
     <div style="display:flex; justify-content:center;">
       <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeJz-JA43wUrAJ9w3nvxKRUSm0Y6MoZ92uCYUM8oN9iaYM2Qg/viewform?embedded=true" width="640" height="1223" frameborder="0" marginheight="0" marginwidth="0" style="max-width:100%; border-radius:15px; background:rgba(255,255,255,0.9);">Loading…</iframe>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" id="contact">
     <h2>Contact Us</h2>
     <div class="card">
       <form action="https://formsubmit.co/loopfidgets3dprint@proton.me" method="POST">
@@ -330,7 +492,7 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" id="pricing">
     <h2>Pricing</h2>
     <table class="price-table">
       <thead>
@@ -374,6 +536,18 @@
   </footer>
 
   <script>
+    function openProduct(src, name, price) {
+      document.getElementById("modal-img").src = src;
+      document.getElementById("modal-img").alt = name;
+      document.getElementById("modal-name").textContent = name;
+      document.getElementById("modal-price").textContent = price;
+      document.getElementById("product-modal").classList.add("open");
+    }
+
+    function closeProduct() {
+      document.getElementById("product-modal").classList.remove("open");
+    }
+
     function showQRCode() {
       document.getElementById("paymentDisplay").innerHTML =
         '<img src="WhatsApp Image 2025-08-08 at 19.31.23_cb90c9bc.jpg" alt="Revolut QR Code">';
