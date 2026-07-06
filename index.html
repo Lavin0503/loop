@@ -8,10 +8,34 @@
   <title>Loop Fidgets & 3D Prints – Custom Fidget Toys & 3D Printed Creations</title>
 
   <!-- SEO DESCRIPTION -->
-  <meta name="description" content="Loop Fidgets & 3D Prints creates custom fidget toys and 3D printed designs. Colourful fidget loops, keychains, and personalised 3D prints made to order." />
+  <meta name="description" content="Cheap fidgets in Balbriggan. Loop Fidgets & 3D Prints offers affordable custom fidget toys locally.">
 
   <!-- SEO KEYWORDS -->
-  <meta name="keywords" content="Loop Fidgets, 3D Prints, fidget toys, custom 3D printing, fidget loops, handmade fidgets, 3D printed keychains, custom prints Ireland" />
+  <meta name="keywords" content="
+fidgets Balbriggan,
+cheap fidgets Balbriggan,
+fidget toys Balbriggan,
+Balbriggan fidgets,
+fidgets near me Balbriggan,
+fidgets shop Balbriggan,
+fidgets Balbriggan cheap,
+3D printed fidgets Balbriggan,
+custom fidgets Balbriggan,
+Loop Fidgets Balbriggan,
+Balbriggan fidget store,
+Balbriggan fidget shop,
+Balbriggan toys,
+sensory toys Balbriggan,
+stress toys Balbriggan,
+fidget cubes Balbriggan,
+fidget spinners Balbriggan,
+fidget gifts Balbriggan,
+kids fidgets Balbriggan,
+local fidgets Balbriggan,
+Balbriggan fidget seller,
+Balbriggan 3D prints,
+Balbriggan 3D printed toys
+">
 
   <!-- FAVICON -->
   <link rel="icon" href="Logo.webp" type="image/webp"/>
@@ -73,7 +97,8 @@
 
     .banner {
       width: 100%;
-      height: 320px;
+      aspect-ratio: 1808 / 1278;
+      height: auto;
       object-fit: cover;
       display: block;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
@@ -396,6 +421,7 @@
     <a href="#gallery">Our Creations</a>
     <a href="#payment">Payment</a>
     <a href="#order">Order Form</a>
+    <a href="#track">Track Order</a>
     <a href="#contact">Contact Us</a>
     <a href="#pricing">Pricing</a>
   </nav>
@@ -468,8 +494,21 @@
 
   <section class="section" id="order">
     <h2>Order Form</h2>
+    <p style="text-align:center; font-size:1.1rem;">
+      Your order number: <strong id="order-number-display">Loading…</strong><br>
+      <span style="font-size:0.9rem;">Save this number — you'll use it to track your order status below!</span>
+    </p>
     <div style="display:flex; justify-content:center;">
-      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeJz-JA43wUrAJ9w3nvxKRUSm0Y6MoZ92uCYUM8oN9iaYM2Qg/viewform?embedded=true" width="640" height="1223" frameborder="0" marginheight="0" marginwidth="0" style="max-width:100%; border-radius:15px; background:rgba(255,255,255,0.9);">Loading…</iframe>
+      <iframe id="order-form-iframe" src="" width="640" height="1223" frameborder="0" marginheight="0" marginwidth="0" style="max-width:100%; border-radius:15px; background:rgba(255,255,255,0.9);">Loading…</iframe>
+    </div>
+  </section>
+
+  <section class="section" id="track">
+    <h2>Track Your Order</h2>
+    <div class="card">
+      <input type="text" id="track-order-input" placeholder="Enter your order number (e.g. LF-482913)">
+      <button type="button" onclick="trackOrder()" style="background: rgba(0,0,0,0.35); color: white; border: 1px solid rgba(255,255,255,0.5); padding: 12px 20px; border-radius: 10px; cursor: pointer; font-size: 1rem;">Check Status</button>
+      <p id="track-result" style="text-align:center; font-size:1.1rem; min-height:1.5em;"></p>
     </div>
   </section>
 
@@ -532,6 +571,83 @@
   </footer>
 
   <script>
+    // ====== CONFIGURE THESE THREE VALUES ======
+    // 1. Your Google Form's base "viewform" URL (without any query string)
+    const FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeJz-JA43wUrAJ9w3nvxKRUSm0Y6MoZ92uCYUM8oN9iaYM2Qg/viewform";
+
+    // 2. The entry ID for the "Order Number" short-answer question in your form
+    //    Find it by opening your form, right-click -> View Page Source, search for "entry."
+    const ORDER_NUMBER_ENTRY_ID = "entry.267450949";
+
+    // 3. Your response spreadsheet's "Publish to web" CSV link
+    //    Sheet -> File -> Share -> Publish to web -> select the responses tab -> CSV
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS3fJ1PyLm0NzdFaHzxF2qw4UhJDq2Krkpxu-OTZu96yjp3dSqQKO_O6EzlmLSg-A2E_IAPjJqWMPBx/pub?gid=1095204490&single=true&output=csv";
+    // ===========================================
+
+    function generateOrderNumber() {
+      const rand = Math.floor(100000 + Math.random() * 900000);
+      return "LF-" + rand;
+    }
+
+    function setupOrderForm() {
+      const orderNumber = generateOrderNumber();
+      document.getElementById("order-number-display").textContent = orderNumber;
+
+      let iframeSrc = FORM_BASE_URL + "?embedded=true&usp=pp_url";
+      if (!ORDER_NUMBER_ENTRY_ID.includes("REPLACE")) {
+        iframeSrc += "&" + ORDER_NUMBER_ENTRY_ID + "=" + encodeURIComponent(orderNumber);
+      }
+      document.getElementById("order-form-iframe").src = iframeSrc;
+    }
+
+    function parseCSV(text) {
+      const rows = text.trim().split("\n").map(r => r.split(",").map(c => c.trim().replace(/^"|"$/g, "")));
+      const headers = rows[0].map(h => h.toLowerCase());
+      return rows.slice(1).map(row => {
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = row[i]);
+        return obj;
+      });
+    }
+
+    async function trackOrder() {
+      const input = document.getElementById("track-order-input").value.trim();
+      const resultEl = document.getElementById("track-result");
+
+      if (!input) {
+        resultEl.textContent = "Please enter an order number.";
+        return;
+      }
+
+      if (SHEET_CSV_URL.includes("REPLACE")) {
+        resultEl.textContent = "Order tracking isn't set up yet — check back soon!";
+        return;
+      }
+
+      resultEl.textContent = "Checking…";
+
+      try {
+        const response = await fetch(SHEET_CSV_URL);
+        const text = await response.text();
+        const records = parseCSV(text);
+
+        const match = records.find(r =>
+          Object.values(r).some(v => v && v.toLowerCase() === input.toLowerCase())
+        );
+
+        if (match) {
+          const status = match["status"] || "No status set yet";
+          resultEl.textContent = "Status: " + status;
+        } else {
+          resultEl.textContent = "Order number not found. Please double check it.";
+        }
+      } catch (err) {
+        resultEl.textContent = "Couldn't check status right now — please try again later.";
+      }
+    }
+
+    setupOrderForm();
+
     function openProduct(src, name, price) {
       document.getElementById("modal-img").src = src;
       document.getElementById("modal-img").alt = name;
