@@ -407,6 +407,78 @@ Balbriggan 3D printed toys
     .modal-close:hover {
       background: rgba(0,0,0,0.6);
     }
+
+    /* ===== MOBILE RESPONSIVE ===== */
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .tagline {
+        font-size: 1rem;
+      }
+
+      #top-nav {
+        gap: 2px;
+        padding: 6px;
+      }
+
+      #top-nav a {
+        font-size: 0.8rem;
+        padding: 5px 8px;
+      }
+
+      .section {
+        padding: 25px 15px;
+        margin-top: 15px;
+        border-radius: 14px;
+      }
+
+      .banner {
+        height: 160px;
+      }
+
+      .gallery {
+        gap: 14px;
+      }
+
+      .gallery-item {
+        max-width: 45%;
+      }
+
+      .price-table th, .price-table td {
+        padding: 8px 6px;
+        font-size: 0.9rem;
+      }
+
+      .card {
+        max-width: 100%;
+        padding: 18px;
+      }
+
+      .card input, .card textarea {
+        font-size: 0.95rem;
+      }
+
+      iframe {
+        width: 100% !important;
+      }
+
+      .modal-content {
+        padding: 15px;
+        max-width: 95%;
+      }
+
+      .modal-content h3 {
+        font-size: 1.3rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .gallery-item {
+        max-width: 100%;
+      }
+    }
   </style>
 </head>
 
@@ -492,17 +564,6 @@ Balbriggan 3D printed toys
     <div class="payment-display" id="paymentDisplay"></div>
   </section>
 
-  <section class="section" id="order">
-    <h2>Order Form</h2>
-    <p style="text-align:center; font-size:1.1rem;">
-      Your order number: <strong id="order-number-display">Loading…</strong><br>
-      <span style="font-size:0.9rem;">Save this number — you'll use it to track your order status below!</span>
-    </p>
-    <div style="display:flex; justify-content:center;">
-      <iframe id="order-form-iframe" src="" width="640" height="1223" frameborder="0" marginheight="0" marginwidth="0" style="max-width:100%; border-radius:15px; background:rgba(255,255,255,0.9);">Loading…</iframe>
-    </div>
-  </section>
-
   <section class="section" id="track">
     <h2>Track Your Order</h2>
     <div class="card">
@@ -511,6 +572,18 @@ Balbriggan 3D printed toys
       <p id="track-result" style="text-align:center; font-size:1.1rem; min-height:1.5em;"></p>
     </div>
   </section>
+
+  <section class="section" id="order">
+    <h2>Order Form</h2>
+    <p style="text-align:center; font-size:1.1rem;">
+      Your order number: <strong id="order-number-display">Loading…</strong><br>
+      <span style="font-size:0.9rem;">Save this number — you'll use it to track your order status above!</span>
+    </p>
+    <div style="display:flex; justify-content:center;">
+      <iframe id="order-form-iframe" src="" width="640" height="1223" frameborder="0" marginheight="0" marginwidth="0" style="max-width:100%; border-radius:15px; background:rgba(255,255,255,0.9);">Loading…</iframe>
+    </div>
+  </section>
+
 
   <section class="section" id="contact">
     <h2>Contact Us</h2>
@@ -568,6 +641,8 @@ Balbriggan 3D printed toys
   <footer>
     &copy; 2026 Loop Fidgets & 3D Prints — Handmade with Love 💜
     Contact: loopfidgets3dprint@proton.me
+    <br>
+    <a href="https://lavin0503.github.io/loop/print.html" style="color:#ffe8ff; text-decoration:underline;">Prints</a>
   </footer>
 
   <script>
@@ -600,9 +675,38 @@ Balbriggan 3D printed toys
       document.getElementById("order-form-iframe").src = iframeSrc;
     }
 
+    function parseCSVLine(line) {
+      const cells = [];
+      let cur = "";
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (inQuotes) {
+          if (c === '"') {
+            if (line[i + 1] === '"') { cur += '"'; i++; }
+            else { inQuotes = false; }
+          } else {
+            cur += c;
+          }
+        } else {
+          if (c === '"') {
+            inQuotes = true;
+          } else if (c === ',') {
+            cells.push(cur.trim());
+            cur = "";
+          } else {
+            cur += c;
+          }
+        }
+      }
+      cells.push(cur.trim());
+      return cells;
+    }
+
     function parseCSV(text) {
-      const rows = text.trim().split("\n").map(r => r.split(",").map(c => c.trim().replace(/^"|"$/g, "")));
-      const headers = rows[0].map(h => h.toLowerCase());
+      const lines = text.trim().split("\n");
+      const rows = lines.map(parseCSVLine);
+      const headers = rows[0].map(h => h.toLowerCase().trim());
       return rows.slice(1).map(row => {
         const obj = {};
         headers.forEach((h, i) => obj[h] = row[i]);
