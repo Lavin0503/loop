@@ -289,6 +289,17 @@ Balbriggan 3D printed toys
       gap: 14px;
     }
 
+    .track-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .track-row input {
+      flex: 1 1 200px;
+    }
+
     .card input,
     .card textarea {
       padding: 12px;
@@ -567,9 +578,11 @@ Balbriggan 3D printed toys
   <section class="section" id="track">
     <h2>Track Your Order</h2>
     <div class="card">
-      <input type="text" id="track-order-input" placeholder="Enter your order number (e.g. LF-482913)">
-      <button type="button" onclick="trackOrder()" style="background: rgba(0,0,0,0.35); color: white; border: 1px solid rgba(255,255,255,0.5); padding: 12px 20px; border-radius: 10px; cursor: pointer; font-size: 1rem;">Check Status</button>
-      <p id="track-result" style="text-align:center; font-size:1.1rem; min-height:1.5em;"></p>
+      <div class="track-row">
+        <input type="text" id="track-order-input" placeholder="Enter your order number (e.g. LF-482913)">
+        <button type="button" onclick="trackOrder()" style="background: rgba(0,0,0,0.35); color: white; border: 1px solid rgba(255,255,255,0.5); padding: 12px 20px; border-radius: 10px; cursor: pointer; font-size: 1rem; white-space:nowrap;">Check Status</button>
+      </div>
+      <p id="track-result" style="text-align:center; font-size:1.1rem; margin:0;"></p>
     </div>
   </section>
 
@@ -717,6 +730,7 @@ Balbriggan 3D printed toys
     async function trackOrder() {
       const input = document.getElementById("track-order-input").value.trim();
       const resultEl = document.getElementById("track-result");
+      resultEl.style.marginTop = "14px";
 
       if (!input) {
         resultEl.textContent = "Please enter an order number.";
